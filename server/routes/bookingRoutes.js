@@ -1,13 +1,24 @@
-// EzLabs/server/routes/bookingRoutes.js
+// EzLabs/server/routes/bookingRoutes.js - UPDATED
 const express = require('express');
 const router = express.Router();
-const { createBooking, getUserBookings } = require('../controllers/bookingController');
-const { protect } = require('../middleware/authMiddleware'); // Import the protect middleware
+const {
+  createBooking,
+  getUserBookings,
+  getAllBookings,     // NEW: Import
+  updateBookingStatus // NEW: Import
+} = require('../controllers/bookingController');
+const { protect } = require('../middleware/authMiddleware');
+const { authorizeRoles } = require('../middleware/roleMiddleware'); // NEW: Import authorizeRoles
 
-// Route to create a new booking (requires user to be logged in)
+// User-specific routes
 router.post('/', protect, createBooking);
-
-// Route to get all bookings for the logged-in user (requires user to be logged in)
 router.get('/my', protect, getUserBookings);
+
+// Admin-specific routes
+// Get all bookings - requires admin role
+router.get('/all', protect, authorizeRoles('admin'), getAllBookings);
+
+// Update booking status - requires admin role
+router.put('/:id/status', protect, authorizeRoles('admin'), updateBookingStatus);
 
 module.exports = router;

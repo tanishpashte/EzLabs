@@ -1,14 +1,15 @@
-// EzLabs/server/server.js (or index.js) - Additions
+// EzLabs/server/server.js - Additions for Lab Test Results
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cors = require('cors');
 
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
-// NEW: Import bookingRoutes
-const bookingRoutes = require('./routes/bookingRoutes'); // Import booking routes
+const bookingRoutes = require('./routes/bookingRoutes');
+// NEW: Import labTestRoutes
+const labTestRoutes = require('./routes/labTestRoutes'); // Import lab test routes
 
 const { protect } = require('./middleware/authMiddleware');
 
@@ -27,12 +28,13 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/services', serviceRoutes);
-// NEW: Booking Routes
-app.use('/api/bookings', bookingRoutes); // Mount booking routes at /api/bookings
+app.use('/api/bookings', bookingRoutes);
+// NEW: Lab Test Routes
+app.use('/api/labresults', labTestRoutes); // Mount lab test routes at /api/labresults
 
 app.get('/api/user/profile', protect, (req, res) => {
   res.json({
-    message: `Welcome to your protected profile, user ID: ${req.user}`,
+    message: `Welcome to your protected profile, user ID: ${req.user.id}`, // Ensure .id for string display
     data: { userId: req.user, secretInfo: "This is top secret!" }
   });
 });

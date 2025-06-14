@@ -1,28 +1,25 @@
-// EzLabs/server/controllers/bookingController.js
-const Booking = require('../models/Booking'); // Import the Booking model
-const User = require('../models/User');     // Import User model to populate user data (optional)
-const Service = require('../models/Service'); // Import Service model to validate service exists
+// EzLabs/server/controllers/bookingController.js - COMPLETE AND CORRECT VERSION
+const Booking = require('../models/Booking');
+const User = require('../models/User'); // Used for population, ensure correct path if needed
+const Service = require('../models/Service'); // Used for service validation
 
 // @desc    Create a new booking
 // @route   POST /api/bookings
 // @access  Private (User)
 const createBooking = async (req, res) => {
-  // Get user ID from the `req.user` object, set by `protect` middleware
-  const userId = req.user;
+  const userId = req.user.id; // Correctly get user ID from req.user object
   const { service, date, time, address, notes } = req.body;
 
-  // Basic validation
   if (!service || !date || !time || !address || !address.street || !address.city || !address.state || !address.zipCode) {
     return res.status(400).json({ message: 'Please provide all required booking details including full address.' });
   }
 
-  // Optional: Verify the service exists and is active
-  const existingService = await Service.findOne({ name: service, isActive: true });
-  if (!existingService) {
-      return res.status(400).json({ message: 'Selected service is not valid or available.' });
-  }
-
   try {
+    const existingService = await Service.findOne({ name: service, isActive: true });
+    if (!existingService) {
+        return res.status(400).json({ message: 'Selected service is not valid or currently available.' });
+    }
+
     const booking = await Booking.create({
       user: userId,
       service,
@@ -30,7 +27,7 @@ const createBooking = async (req, res) => {
       time,
       address,
       notes,
-      status: 'pending', // Default status upon creation
+      status: 'pending',
     });
 
     res.status(201).json({
@@ -48,10 +45,9 @@ const createBooking = async (req, res) => {
 // @access  Private (User)
 const getUserBookings = async (req, res) => {
   try {
-    // Find bookings where the 'user' field matches the ID from the token
-    const bookings = await Booking.find({ user: req.user })
-                                  .populate('user', 'name email') // Optionally populate user name/email
-                                  .sort({ createdAt: -1 }); // Sort by newest first
+    const bookings = await Booking.find({ user: req.user.id }) // Use req.user.id here
+                                  .populate('user', 'name email')
+                                  .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -64,7 +60,72 @@ const getUserBookings = async (req, res) => {
   }
 };
 
+// @desc    Get all bookings (for Admin)
+// @route   GET /api/bookings/all
+// @access  Private (Admin only)
+const getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({})
+                                  .populate('user', 'name email')
+                                  .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: bookings.length,
+      data: bookings,
+    });
+  } catch (error) {
+    console.error('Error fetching all bookings:', error);
+    res.status(500).json({ message: 'Server Error: Could not fetch all bookings' });
+  }
+};
+
+// @desc    Update booking status (for Admin)
+// @route   PUT /api/bookings/:id/status
+// @access  Private (Admin only)
+const updateBookingStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const validStatuses = [
+    'pending',
+    'confirmed',
+    'assigned',
+    'on the way',
+    'sample collected',
+    'sample processing',
+    'reports generation',
+    'completed',
+    'cancelled',
+    'rescheduled'
+  ];
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ message: 'Please provide a valid booking status.' });
+  }
+
+  try {
+    const booking = await Booking.findById(id);
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    booking.status = status;
+    await booking.save();
+
+    res.status(200).json({
+      message: 'Booking status updated successfully',
+      data: booking,
+    });
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    res.status(500).json({ message: 'Server Error: Could not update booking status' });
+  }
+};
+
 module.exports = {
   createBooking,
   getUserBookings,
+  getAllBookings,
+  updateBookingStatus,
 };
