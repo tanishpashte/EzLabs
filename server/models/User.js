@@ -1,31 +1,48 @@
+// EzLabs/server/models/User.js - REVISED
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs'); 
 
-const UserSchema = new mongoose.Schema({
+const userSchema = mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: true,
-        trim: true 
+      type: String,
+      required: [true, 'Please add a name'],
     },
     email: {
-        type: String,
-        required: true,
-        unique: true, 
-        trim: true,
-        lowercase: true 
+      type: String,
+      required: [true, 'Please add an email'],
+      unique: true,
     },
     password: {
-        type: String,
-        required: true
+      type: String,
+      required: [true, 'Please add a password'],
     },
-    role: {
-        type: String,
-        enum: ['user', 'admin'], 
-        default: 'user' 
+    role: { // NEW FIELD: User Role
+      type: String,
+      enum: ['user', 'admin'], 
+      default: 'user',       
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+  },
+  {
+    timestamps: true, 
+  }
+);
+
+
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-module.exports = mongoose.model('User', UserSchema);
+
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
