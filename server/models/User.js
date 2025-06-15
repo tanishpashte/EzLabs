@@ -1,4 +1,3 @@
-// EzLabs/server/models/User.js - REVISED
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); 
 

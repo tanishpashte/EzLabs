@@ -1,4 +1,3 @@
-// EzLabs/server/middleware/roleMiddleware.js - VERIFY THIS CODE
 // Middleware to check if the authenticated user has the 'admin' role
 
 const authorizeRoles = (...roles) => {
@@ -21,8 +20,4 @@ const authorizeRoles = (...roles) => {
   };
 };
 
-module.exports = { authorizeRoles }; // Make sure this line exports it correctly
-
-// EzLabs/server/middleware/roleMiddleware.js - Add this at the very end
-// console.log('Type of authorizeRoles function:', typeof authorizeRoles);
-// console.log('Type of authorizeRoles("admin") result:', typeof authorizeRoles('admin'));
+module.exports = { authorizeRoles }; 

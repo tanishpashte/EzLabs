@@ -2,10 +2,10 @@ const User = require('../models/User');
 
 // @desc    Get all users
 // @route   GET /api/users
-// @access  Private (Admin only - for future, currently any authenticated user)
+// @access  Private 
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({}).select('-password'); // Exclude password field
+    const users = await User.find({}).select('-password'); 
 
     res.status(200).json({
       success: true,

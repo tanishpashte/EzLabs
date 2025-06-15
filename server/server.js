@@ -1,4 +1,3 @@
-// EzLabs/server/server.js - Additions for Lab Test Results
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
@@ -9,7 +8,7 @@ const userRoutes = require('./routes/userRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 // NEW: Import labTestRoutes
-const labTestRoutes = require('./routes/labTestRoutes'); // Import lab test routes
+const labTestRoutes = require('./routes/labTestRoutes'); 
 
 const { protect } = require('./middleware/authMiddleware');
 
@@ -30,11 +29,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/bookings', bookingRoutes);
 // NEW: Lab Test Routes
-app.use('/api/labresults', labTestRoutes); // Mount lab test routes at /api/labresults
+app.use('/api/labresults', labTestRoutes); 
 
 app.get('/api/user/profile', protect, (req, res) => {
   res.json({
-    message: `Welcome to your protected profile, user ID: ${req.user.id}`, // Ensure .id for string display
+    message: `Welcome to your protected profile, user ID: ${req.user.id}`, 
     data: { userId: req.user, secretInfo: "This is top secret!" }
   });
 });

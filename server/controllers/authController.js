@@ -1,10 +1,10 @@
-// EzLabs/server/controllers/authController.js - This is the definitive version
+
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // Needed for password hashing and comparison
-const User = require('../models/User'); // Import the User model
+const bcrypt = require('bcryptjs'); 
+const User = require('../models/User'); 
 
 // Helper function to generate a JWT token
-// This function explicitly takes 'id' and 'role' to include in the token payload.
+
 const generateToken = (id, role) => {
   // The payload contains the user's ID and role, crucial for middleware checks.
   return jwt.sign({ user: { id, role } }, process.env.JWT_SECRET, {
@@ -36,8 +36,6 @@ const registerUser = async (req, res) => {
       name,
       email,
       password, // Password will be hashed by the pre-save hook in the User model
-      // If you ever want to register an admin via API, you'd add 'role' here if provided:
-      // role: req.body.role || 'user',
     });
 
     if (user) {
@@ -45,7 +43,7 @@ const registerUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role, // Include role in the response
+        role: user.role, 
         token: generateToken(user._id, user.role), // Generate token with user's ID and role
       });
     } else {
@@ -73,11 +71,11 @@ const loginUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role, // Include role in the response
-        token: generateToken(user._id, user.role), // Generate token with user's ID and role
+        role: user.role, 
+        token: generateToken(user._id, user.role), 
       });
     } else {
-      res.status(400).json({ message: 'Invalid credentials' }); // User not found or password mismatch
+      res.status(400).json({ message: 'Invalid credentials' }); 
     }
   } catch (error) {
     console.error('Error during user login:', error);

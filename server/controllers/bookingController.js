@@ -1,13 +1,12 @@
-// EzLabs/server/controllers/bookingController.js - COMPLETE AND CORRECT VERSION
 const Booking = require('../models/Booking');
-const User = require('../models/User'); // Used for population, ensure correct path if needed
-const Service = require('../models/Service'); // Used for service validation
+const User = require('../models/User'); 
+const Service = require('../models/Service'); 
 
 // @desc    Create a new booking
 // @route   POST /api/bookings
 // @access  Private (User)
 const createBooking = async (req, res) => {
-  const userId = req.user.id; // Correctly get user ID from req.user object
+  const userId = req.user.id; 
   const { service, date, time, address, notes } = req.body;
 
   if (!service || !date || !time || !address || !address.street || !address.city || !address.state || !address.zipCode) {
@@ -45,7 +44,7 @@ const createBooking = async (req, res) => {
 // @access  Private (User)
 const getUserBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user.id }) // Use req.user.id here
+    const bookings = await Booking.find({ user: req.user.id }) 
                                   .populate('user', 'name email')
                                   .sort({ createdAt: -1 });
 

@@ -1,4 +1,3 @@
-// EzLabs/server/routes/labTestRoutes.js
 const express = require('express');
 const router = express.Router();
 const { createTestResult, getMyTestResults } = require('../controllers/labTestController');

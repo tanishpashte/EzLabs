@@ -1,14 +1,13 @@
-// EzLabs/server/routes/bookingRoutes.js - UPDATED
 const express = require('express');
 const router = express.Router();
 const {
   createBooking,
   getUserBookings,
-  getAllBookings,     // NEW: Import
-  updateBookingStatus // NEW: Import
+  getAllBookings,     
+  updateBookingStatus 
 } = require('../controllers/bookingController');
 const { protect } = require('../middleware/authMiddleware');
-const { authorizeRoles } = require('../middleware/roleMiddleware'); // NEW: Import authorizeRoles
+const { authorizeRoles } = require('../middleware/roleMiddleware'); 
 
 // User-specific routes
 router.post('/', protect, createBooking);

@@ -1,4 +1,3 @@
-// EzLabs/server/controllers/labTestController.js
 const LabTestResult = require('../models/LabTestResult');
 const User = require('../models/User'); // To check if user exists for result assignment
 
@@ -21,7 +20,7 @@ const createTestResult = async (req, res) => {
     }
 
     const labTestResult = await LabTestResult.create({
-      user: user._id, // Store the user's ObjectId
+      user: user._id, 
       testName,
       testDate,
       resultValue,
@@ -48,7 +47,7 @@ const getMyTestResults = async (req, res) => {
   try {
     // req.user.id holds the ID of the logged-in user
     const results = await LabTestResult.find({ user: req.user.id })
-                                        .populate('user', 'name email') // Optionally populate user details
+                                        .populate('user', 'name email') 
                                         .sort({ testDate: -1, createdAt: -1 }); // Sort by test date, then creation date
 
     res.status(200).json({

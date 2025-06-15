@@ -1,4 +1,4 @@
-// EzLabs/server/controllers/serviceController.js - ABSOLUTELY COMPLETE AND CORRECT VERSION
+
 const Service = require('../models/Service');
 
 // @desc    Create a new service
@@ -55,8 +55,8 @@ const getServices = async (req, res) => {
 // @route   PUT /api/services/:id
 // @access  Private (Admin only)
 const updateService = async (req, res) => {
-  const { id } = req.params; // Service ID from URL
-  const { name, description, price, type, isActive } = req.body; // Allow updating isActive too
+  const { id } = req.params; 
+  const { name, description, price, type, isActive } = req.body; 
 
   try {
     let service = await Service.findById(id);
@@ -68,7 +68,7 @@ const updateService = async (req, res) => {
     // Check if name is being changed and if new name already exists for another service
     if (name && name !== service.name) {
         const serviceExists = await Service.findOne({ name });
-        // IMPORTANT: Ensure the existing service is NOT the one we are currently updating
+        
         if (serviceExists && serviceExists._id.toString() !== id) {
             return res.status(400).json({ message: 'Service with this name already exists.' });
         }
@@ -84,7 +84,7 @@ const updateService = async (req, res) => {
         service.isActive = isActive;
     }
 
-    const updatedService = await service.save(); // Use save() to trigger pre-save hooks if any
+    const updatedService = await service.save(); 
 
     res.status(200).json({
       message: 'Service updated successfully',
@@ -100,7 +100,7 @@ const updateService = async (req, res) => {
 // @route   DELETE /api/services/:id
 // @access  Private (Admin only)
 const deleteService = async (req, res) => {
-  const { id } = req.params; // Service ID from URL
+  const { id } = req.params; 
 
   try {
     const service = await Service.findById(id);
@@ -109,7 +109,7 @@ const deleteService = async (req, res) => {
       return res.status(404).json({ message: 'Service not found' });
     }
 
-    await service.deleteOne(); // Mongoose 6+ uses deleteOne() or deleteMany()
+    await service.deleteOne(); 
 
     res.status(200).json({
       message: 'Service removed successfully',
@@ -123,6 +123,6 @@ const deleteService = async (req, res) => {
 module.exports = {
   createService,
   getServices,
-  updateService, // Ensure these are correctly listed here
-  deleteService, // Ensure these are correctly listed here
+  updateService, 
+  deleteService, 
 };
