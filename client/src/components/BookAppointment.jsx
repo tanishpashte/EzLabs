@@ -1,4 +1,4 @@
-// client/src/components/BookAppointment.jsx - Corrected Address Fields & Time Slot Dropdown
+// client/src/components/BookAppointment.jsx - Corrected API Endpoint to /api/bookings
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -92,11 +92,16 @@ function BookAppointment() {
     const fullAddress = `${formData.streetAddress}, ${formData.city}, ${formData.state} - ${formData.zipCode}, ${formData.country}`;
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/appointments`, {
+      // CORRECTED: Changed endpoint to /api/bookings
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/bookings`, {
         serviceName: formData.serviceName,
         appointmentDate: formData.appointmentDate,
         timeSlot: formData.timeSlot,
-        address: fullAddress, // Send the concatenated address string
+        streetAddress: formData.streetAddress, // Send separate fields as expected by current backend controller
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country,
         notes: formData.notes,
       }, {
         headers: {

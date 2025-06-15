@@ -1,4 +1,4 @@
-// client/src/components/UploadTestResult.jsx - Corrected Original Fields + Test Name Dropdown
+// client/src/components/UploadTestResult.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -6,35 +6,32 @@ import axios from 'axios';
 function UploadTestResult() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    userEmail: '', // Matches "User Email (Patient)"
-    testName: '',    // NOW A DROPDOWN
-    testDate: '',    // Matches "Test Date"
-    resultValue: '', // Matches "Result Value"
-    units: '',       // Matches "Units (Optional)"
-    referenceRange: '', // Matches "Reference Range (Optional)"
-    interpretation: '', // Matches "Interpretation (Optional)"
-    status: 'Pending Review', // Matches "Status" dropdown
+    userEmail: '',
+    testName: '',
+    testDate: '',
+    resultValue: '',
+    units: '',
+    referenceRange: '',
+    interpretation: '',
+    // Ensure this default matches an enum value in your schema
+    status: 'pending review', // THIS MUST BE ONE OF THE ENUM VALUES
   });
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false); // For form submission
-  const [services, setServices] = useState([]); // To store available services for the dropdown
+  const [loading, setLoading] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const [services, setServices] = useState([]); // State to store available services
   const [servicesLoading, setServicesLoading] = useState(true); // For fetching services
-  const [userRole, setUserRole] = useState(null); // To check user role for access
 
-  // Possible statuses for the dropdown, based on your screenshot's default
-  const testStatuses = ["Pending Review", "Reviewed", "Finalized"];
+  // Valid status options for the dropdown, MUST match LabTestResult schema enum
+  const testStatuses = ["pending review", "finalized", "published", "archived"];
 
 
-  // Fetch user role and services on component mount
   useEffect(() => {
     const role = localStorage.getItem('role');
     setUserRole(role);
-
-    // If not admin, redirect immediately
     if (role !== 'admin') {
-      setMessage('Access Denied! You must be an administrator to upload test results. Redirecting...');
-      setServicesLoading(false);
-      setTimeout(() => navigate('/login'), 1500);
+      alert('Access Denied! You must be an administrator to upload test results.');
+      navigate('/login');
       return;
     }
 
@@ -48,18 +45,15 @@ function UploadTestResult() {
       }
 
       try {
-        // Fetch all services to populate the dropdown
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/services`, {
            headers: { Authorization: `Bearer ${token}` }
         });
-        // Filter for active services
         setServices(response.data.data.filter(service => service.isActive));
         setServicesLoading(false);
       } catch (error) {
         console.error('Failed to fetch services for dropdown:', error.response?.data || error.message);
         setMessage('Failed to load services for test name dropdown. Please try again.');
         setServicesLoading(false);
-        // If token is invalid, clear and redirect
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('userId');
@@ -68,7 +62,7 @@ function UploadTestResult() {
     };
 
     fetchServices();
-  }, [navigate]); // Depend on navigate to avoid lint warnings
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -76,8 +70,8 @@ function UploadTestResult() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(''); // Clear previous messages
-    setLoading(true); // Set loading state
+    setMessage('');
+    setLoading(true);
 
     const token = localStorage.getItem('token');
     if (!token || userRole !== 'admin') {
@@ -86,18 +80,15 @@ function UploadTestResult() {
       return;
     }
 
-    // Prepare data to send (match backend expectation for lab result structure)
-    // IMPORTANT: Backend must be updated to accept these specific fields (testDate, resultValue, units, etc.)
-    // If backend only accepts 'testName', 'userEmail', 'resultUrl', 'notes' - this will require backend update too.
-    // For now, assuming backend will accept these. If not, the backend will return an error.
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/lab-results/upload`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/labresults`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setMessage(response.data.message || 'Lab test result uploaded successfully!');
-      // Clear form fields on success
+      setLoading(false);
+      // Clear form after successful upload
       setFormData({
         userEmail: '',
         testName: '',
@@ -106,17 +97,15 @@ function UploadTestResult() {
         units: '',
         referenceRange: '',
         interpretation: '',
-        status: 'Pending Review',
+        status: 'pending review', // Reset to default
       });
     } catch (error) {
-      console.error('Upload error:', error.response?.data || error.message);
-      setMessage(error.response?.data?.message || 'Failed to upload result. Ensure email and test name are correct.');
-    } finally {
-      setLoading(false); // Always stop loading
+      console.error('Upload test result error:', error.response?.data || error.message);
+      setMessage(error.response?.data?.message || 'Failed to upload test result. Check user email or data.');
+      setLoading(false);
     }
   };
 
-  // Render loading state while services are being fetched or user role is determined
   if (servicesLoading || userRole === null) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -125,7 +114,6 @@ function UploadTestResult() {
     );
   }
 
-  // Render access denied if not an admin
   if (userRole !== 'admin') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-red-50 bg-opacity-70 text-red-700 p-4">
@@ -134,13 +122,14 @@ function UploadTestResult() {
     );
   }
 
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-50 to-orange-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg"> {/* Increased width for more fields */}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-4">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
         <h2 className="text-3xl font-bold text-center text-red-700 mb-6">Upload Lab Test Result</h2>
 
         {message && (
-          <p className={`mb-4 text-center ${message.includes('successfully') ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`mb-4 text-center ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
             {message}
           </p>
         )}
@@ -161,6 +150,7 @@ function UploadTestResult() {
             />
           </div>
 
+          {/* Test Name Dropdown */}
           <div className="mb-4">
             <label htmlFor="testName" className="block text-gray-700 text-sm font-bold mb-2">
               Test Name:
@@ -259,6 +249,7 @@ function UploadTestResult() {
             ></textarea>
           </div>
 
+          {/* Status Dropdown - Ensure options match schema enum values exactly */}
           <div className="mb-6">
             <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">
               Status:
@@ -269,9 +260,10 @@ function UploadTestResult() {
               className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               value={formData.status}
               onChange={handleChange}
+              required
             >
               {testStatuses.map(statusOption => (
-                <option key={statusOption} value={statusOption}>{statusOption}</option>
+                <option key={statusOption} value={statusOption}>{statusOption.replace(/\b\w/g, char => char.toUpperCase())}</option> // Capitalize for display, value remains lowercase
               ))}
             </select>
           </div>
