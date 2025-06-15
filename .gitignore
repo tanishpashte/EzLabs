@@ -1,34 +1,21 @@
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# Dependency directories
+# Dependency directories (ignore for all subfolders unless specified otherwise)
 node_modules/
-jspm_packages/
-web_modules/
 
-# Production build files
-build/
-dist/
-.cache/
-.next/
-.nuxt/
-.vuepress/dist/
-.serverless/
-.webpack/
-.parcel-cache/
-
-# Miscellaneous
-.env
+# Environment variables
+.env 
+.env.local
+# Local/OS/IDE specific files
 .DS_Store
-npm-debug.log
-yarn-error.log
 .vscode/
+.idea/
 *.sqlite
 *.sqlite3
-.idea/
-.env.production
+
