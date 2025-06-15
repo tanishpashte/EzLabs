@@ -1,4 +1,4 @@
-    // client/src/components/ManageServices.jsx - UPDATED WITH EDIT/DELETE
+    
     import React, { useState, useEffect } from 'react';
     import { useNavigate } from 'react-router-dom';
     import axios from 'axios';
@@ -25,7 +25,7 @@
         description: '',
         price: '',
         type: 'Other',
-        isActive: true, // Add isActive for editing
+        isActive: true, 
       });
 
       // Valid service types (matches backend enum)
@@ -42,7 +42,7 @@
         }
 
         try {
-          const response = await axios.get('http://localhost:5000/api/services', {
+          const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/services`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setServices(response.data.data);
@@ -99,7 +99,7 @@
         }
 
         try {
-          const response = await axios.post('http://localhost:5000/api/services', formData, {
+          const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/services`, formData, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -129,7 +129,7 @@
         }
 
         try {
-          const response = await axios.put(`http://localhost:5000/api/services/${currentService._id}`, editFormData, {
+          const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/services/${currentService._id}`, editFormData, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -161,7 +161,7 @@
         }
 
         try {
-          const response = await axios.delete(`http://localhost:5000/api/services/${serviceId}`, {
+          const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/services/${serviceId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

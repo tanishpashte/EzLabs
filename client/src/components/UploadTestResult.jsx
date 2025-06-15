@@ -1,4 +1,3 @@
-// client/src/components/UploadTestResult.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -45,7 +44,7 @@ function UploadTestResult() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/labresults', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/labresults`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

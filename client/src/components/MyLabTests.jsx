@@ -1,4 +1,3 @@
-// client/src/components/MyLabTests.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -20,7 +19,7 @@ function MyLabTests() {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/labresults/my', {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/labresults/my`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

@@ -1,4 +1,3 @@
-// client/src/components/AllBookings.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,7 +7,7 @@ function AllBookings() {
   const [bookings, setBookings] = useState([]);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState(null); // To check user role for access
+  const [userRole, setUserRole] = useState(null); 
 
   // Define all possible statuses for the dropdown
   const allStatuses = [
@@ -44,7 +43,7 @@ function AllBookings() {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/bookings/all', {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/bookings/all`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -75,7 +74,7 @@ function AllBookings() {
     }
 
     try {
-      const response = await axios.put(`http://localhost:5000/api/bookings/${bookingId}/status`,
+      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/bookings/${bookingId}/status`,
         { status: newStatus },
         {
           headers: {
@@ -129,7 +128,7 @@ function AllBookings() {
     );
   }
 
-  if (userRole !== 'admin') { // Should be caught by the useEffect, but good fallback
+  if (userRole !== 'admin') { 
     return (
       <div className="flex items-center justify-center min-h-screen bg-red-50 bg-opacity-70 text-red-700 p-4">
         <p className="text-lg font-semibold">Access Denied: Not an Administrator.</p>

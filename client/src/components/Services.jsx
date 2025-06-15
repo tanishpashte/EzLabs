@@ -1,7 +1,6 @@
-// client/src/components/Services.jsx - REVISED FOR DYNAMIC FETCHING
-import React, { useState, useEffect } from 'react'; // NEW: useEffect
+import React, { useState, useEffect } from 'react'; 
 import { Link } from 'react-router-dom';
-import axios from 'axios'; // NEW: Import axios
+import axios from 'axios'; 
 
 function Services() {
   const [services, setServices] = useState([]); // State to store fetched services
@@ -11,7 +10,7 @@ function Services() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/services');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/services`);
         setServices(response.data.data); // Assuming response.data.data is the array of services
         setLoading(false); // Done loading
       } catch (err) {

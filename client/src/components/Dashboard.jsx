@@ -1,11 +1,10 @@
-// client/src/components/Dashboard.jsx - CONSOLIDATED VERSION (replacing Profile.jsx content)
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null); // Will store { userId, secretInfo }
+  const [userData, setUserData] = useState(null); 
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -20,14 +19,13 @@ function Dashboard() {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/user/profile', {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        // The response.data.data from /api/user/profile contains userId (which is an object {id, role})
-        // and secretInfo.
-        setUserData(response.data.data); // Store the entire data object received
+
+        setUserData(response.data.data); 
         setMessage(response.data.message || 'Profile loaded successfully!');
         setLoading(false);
       } catch (error) {
@@ -70,9 +68,6 @@ function Dashboard() {
             <p className="text-lg"><strong>User Role:</strong> <span className="capitalize">{userData.userId.role}</span></p>
             <p className="text-lg"><strong>Secret Info:</strong> {userData.secretInfo}</p>
             <p className="text-sm text-gray-500 mt-6">This is your personal dashboard, displaying your core information.</p>
-            {/* Future: Add more dashboard summaries or profile fields here */}
-            {/* Example: <p className="text-lg mt-4"><strong>Your Next Appointment:</strong> [Show latest booking here]</p> */}
-            {/* Example: <p className="text-lg"><strong>Total Bookings:</strong> [Count of user bookings]</p> */}
           </div>
         ) : (
           <p className="text-lg text-red-600 text-center">Failed to load user data.</p>

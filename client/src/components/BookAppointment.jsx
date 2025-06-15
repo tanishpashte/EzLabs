@@ -1,4 +1,3 @@
-// client/src/components/BookAppointment.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -28,7 +27,7 @@ function BookAppointment() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/services');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/services`);
         setServices(response.data.data);
         setServiceLoading(false);
         if (response.data.data.length > 0) {
@@ -45,7 +44,7 @@ function BookAppointment() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name in formData.address) { // Handle nested address fields
+    if (name in formData.address) { 
       setFormData({
         ...formData,
         address: {
@@ -75,15 +74,14 @@ function BookAppointment() {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/bookings', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/bookings`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setMessage(response.data.message || 'Appointment booked successfully!');
-      // Optionally clear form or redirect to 'my bookings'
       setFormData({
-        service: services.length > 0 ? services[0].name : '', // Reset to first service or empty
+        service: services.length > 0 ? services[0].name : '', 
         date: '',
         time: '',
         address: {
@@ -96,7 +94,6 @@ function BookAppointment() {
         notes: '',
       });
       setLoading(false);
-      // Optional: navigate('/my-bookings'); after a short delay
     } catch (error) {
       console.error('Booking error:', error.response?.data || error.message);
       setMessage(error.response?.data?.message || 'Failed to book appointment. Please try again.');
@@ -188,7 +185,7 @@ function BookAppointment() {
               Time Slot:
             </label>
             <input
-              type="text" // Or use a time picker if preferred, but text for simplicity now
+              type="text" 
               id="time"
               name="time"
               placeholder="e.g., 10:00 AM - 11:00 AM"
@@ -273,7 +270,7 @@ function BookAppointment() {
               value={formData.address.country}
               onChange={handleChange}
               required
-              readOnly // Make country read-only if default
+              readOnly 
             />
           </div>
         </div>

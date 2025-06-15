@@ -1,4 +1,4 @@
-    // client/src/components/MyBookings.jsx
+    
     import React, { useState, useEffect } from 'react';
     import { useNavigate } from 'react-router-dom';
     import axios from 'axios';
@@ -20,7 +20,7 @@
           }
 
           try {
-            const response = await axios.get('http://localhost:5000/api/bookings/my', {
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/bookings/my`, {
               headers: {
                 Authorization: `Bearer ${token}`
               }

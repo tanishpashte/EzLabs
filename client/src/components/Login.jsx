@@ -1,4 +1,3 @@
-// client/src/components/Login.jsx - REVISED FOR FORCED RELOAD AFTER LOGIN
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -10,7 +9,7 @@ function Login() {
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Keep navigate for other uses if any
+  const navigate = useNavigate(); 
 
   const { email, password } = formData;
 
@@ -24,7 +23,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
         email,
         password,
       });
@@ -36,8 +35,6 @@ function Login() {
       setMessage('Login successful! Redirecting...');
       setLoading(false);
 
-      // Force a full page reload to ensure App.jsx re-reads localStorage
-      // and updates navigation visibility based on the new role.
       if (response.data.role === 'admin') {
         window.location.href = '/admin/dashboard'; // Full reload and redirect
       } else {

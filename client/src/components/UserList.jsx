@@ -1,4 +1,3 @@
-// client/src/components/UserList.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -11,7 +10,6 @@ function UserList() {
   useEffect(() => {
     // Function to fetch user data from the backend
     const fetchUsers = async () => {
-      // Get the JWT token from local storage
       const token = localStorage.getItem('token');
 
       // If no token is found, the user is not logged in
@@ -19,26 +17,22 @@ function UserList() {
         setMessage('You are not logged in. Redirecting to login...');
         // Redirect to the login page after a short delay
         setTimeout(() => navigate('/login'), 1500);
-        return; // Exit the function
+        return; 
       }
 
       try {
-        // Make a GET request to the protected /api/users endpoint
-        // Include the JWT in the Authorization header
-        const response = await axios.get('http://localhost:5000/api/users', {
+        
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users`, {
           headers: {
             Authorization: `Bearer ${token}` // Send the token in 'Bearer TOKEN' format
           }
         });
-        // Set the fetched users data. Assuming the API returns { success: true, count: N, data: [...] }
+        
         setUsers(response.data.data);
         setMessage('Users loaded successfully!');
       } catch (error) {
-        // Log the full error for debugging purposes
         console.error('Failed to fetch users:', error.response?.data || error.message);
-        // Set an appropriate error message to display to the user
         setMessage(error.response?.data?.message || 'Failed to load users. Please log in again.');
-        // If the token is invalid or expired (e.g., 401 Unauthorized), remove it and redirect
         localStorage.removeItem('token');
         setTimeout(() => navigate('/login'), 1500);
       }
@@ -46,7 +40,7 @@ function UserList() {
 
     // Call the fetchUsers function when the component mounts or 'navigate' dependency changes
     fetchUsers();
-  }, [navigate]); // 'navigate' is a dependency because it's used inside useEffect
+  }, [navigate]); 
 
   // Display a loading message while data is being fetched and there's no message yet
   if (!users.length && !message) {
@@ -71,7 +65,7 @@ function UserList() {
 
         {/* Render the table only if there are users to display */}
         {users.length > 0 ? (
-          <div className="overflow-x-auto"> {/* Ensures table is scrollable on smaller screens */}
+          <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200">
               <thead>
                 <tr>
@@ -104,7 +98,7 @@ function UserList() {
             </table>
           </div>
         ) : (
-          // Only show "No users found" if there's no success message (e.g., in case of an error or empty list)
+          // Only show "No users found" if there's no success message 
           !message.includes('success') && (
             <p className="text-center text-gray-600 text-lg">No users found.</p>
           )
