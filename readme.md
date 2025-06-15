@@ -5,6 +5,14 @@ _EzLabs_ is a comprehensive full-stack web application designed to simplify and 
 Built with the **MERN stack** (MongoDB, Express.js, React.js, Node.js), EzLabs ensures a secure, scalable, and user-friendly experience.
 
 ---
+## 🌐 Live Deployment
+
+The EzLabs application is fully deployed and accessible online:
+
+- **Application URL:**  
+    [https://gorgeous-stardust-90dc00.netlify.app/](https://gorgeous-stardust-90dc00.netlify.app/)
+
+---
 
 ## 🚀 Technologies Used
 

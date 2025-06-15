@@ -1,303 +1,321 @@
+// client/src/components/BookAppointment.jsx - Corrected Address Fields & Time Slot Dropdown
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function BookAppointment() {
   const navigate = useNavigate();
-  const [services, setServices] = useState([]); // To store services fetched from backend
   const [formData, setFormData] = useState({
-    service: '',
-    date: '',
-    time: '',
-    address: {
-      street: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: 'India', // Default country
-    },
+    serviceName: '',
+    appointmentDate: '',
+    timeSlot: '', // This will be selected from predefined options
+    // Separate address fields
+    streetAddress: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'India', // Default to India as per screenshot
     notes: '',
   });
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [serviceLoading, setServiceLoading] = useState(true);
-  const [serviceError, setServiceError] = useState(null);
+  const [loading, setLoading] = useState(false); // For form submission
+  const [services, setServices] = useState([]); // To store available services
+  const [servicesLoading, setServicesLoading] = useState(true); // For fetching services
+  const [userRole, setUserRole] = useState(null); // To check user role for access
 
-  // Effect to fetch services when the component mounts
+  // Predefined common time slots for selection
+  const predefinedTimeSlots = [
+    '09:00 AM - 10:00 AM',
+    '10:00 AM - 11:00 AM',
+    '11:00 AM - 12:00 PM',
+    '01:00 PM - 02:00 PM',
+    '02:00 PM - 03:00 PM',
+    '03:00 PM - 04:00 PM',
+    '04:00 PM - 05:00 PM',
+  ];
+
+  // Fetch user role and services on component mount
   useEffect(() => {
+    const role = localStorage.getItem('role');
+    setUserRole(role); // Set role from localStorage
+    const token = localStorage.getItem('token');
+
+    // Redirect if not logged in or is an admin (admins shouldn't book)
+    if (!token || role === 'admin') {
+      setMessage('Access Denied or Not Logged In. Redirecting...');
+      setServicesLoading(false); // Stop loading early
+      setTimeout(() => navigate(role === 'admin' ? '/admin/dashboard' : '/login'), 1500);
+      return;
+    }
+
     const fetchServices = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/services`);
-        setServices(response.data.data);
-        setServiceLoading(false);
-        if (response.data.data.length > 0) {
-            setFormData(prev => ({ ...prev, service: response.data.data[0].name })); // Set default service
-        }
-      } catch (err) {
-        console.error('Error fetching services for booking form:', err);
-        setServiceError('Failed to load services for booking. Please try again.');
-        setServiceLoading(false);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/services`, {
+          headers: { Authorization: `Bearer ${token}` } // Send token even for public services for consistency
+        });
+        // Filter for active services and set them
+        setServices(response.data.data.filter(service => service.isActive));
+        setServicesLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch services:', error.response?.data || error.message);
+        setMessage('Failed to load services. Please try again.');
+        setServicesLoading(false);
+        // Clear token if it's invalid and redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('userId');
+        setTimeout(() => navigate('/login'), 1500);
       }
     };
+
     fetchServices();
-  }, []);
+  }, [navigate]); // Add navigate to dependency array
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name in formData.address) { 
-      setFormData({
-        ...formData,
-        address: {
-          ...formData.address,
-          [name]: value,
-        },
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
-    setLoading(true);
+    setMessage(''); // Clear previous messages
+    setLoading(true); // Set loading state
 
     const token = localStorage.getItem('token');
-    if (!token) {
-      setMessage('You must be logged in to book an appointment. Redirecting to login...');
-      setLoading(false);
-      setTimeout(() => navigate('/login'), 1500);
-      return;
+    // Double check token and role before proceeding
+    if (!token || userRole === 'admin') {
+        setMessage('Unauthorized action. Please log in as a regular user.');
+        setLoading(false);
+        return;
     }
 
+    // Construct the address string from separate fields
+    const fullAddress = `${formData.streetAddress}, ${formData.city}, ${formData.state} - ${formData.zipCode}, ${formData.country}`;
+
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/bookings`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/appointments`, {
+        serviceName: formData.serviceName,
+        appointmentDate: formData.appointmentDate,
+        timeSlot: formData.timeSlot,
+        address: fullAddress, // Send the concatenated address string
+        notes: formData.notes,
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       setMessage(response.data.message || 'Appointment booked successfully!');
+      // Clear form fields on success
       setFormData({
-        service: services.length > 0 ? services[0].name : '', 
-        date: '',
-        time: '',
-        address: {
-          street: '',
-          city: '',
-          state: '',
-          zipCode: '',
-          country: 'India',
-        },
+        serviceName: '',
+        appointmentDate: '',
+        timeSlot: '',
+        streetAddress: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: 'India', // Reset country default
         notes: '',
       });
-      setLoading(false);
     } catch (error) {
       console.error('Booking error:', error.response?.data || error.message);
-      setMessage(error.response?.data?.message || 'Failed to book appointment. Please try again.');
-      setLoading(false);
+      setMessage(error.response?.data?.message || 'Failed to book appointment. Please check your details.');
+    } finally {
+      setLoading(false); // Always stop loading
     }
   };
 
-  if (serviceLoading) {
+  if (servicesLoading || userRole === null) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <p className="text-gray-700 text-lg">Loading booking form...</p>
+        <p className="text-gray-700 text-lg">Loading appointment booking form...</p>
       </div>
     );
   }
 
-  if (serviceError) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-red-50 bg-opacity-70 text-red-700 p-4">
-        <p className="text-lg font-semibold">{serviceError}</p>
-      </div>
-    );
-  }
-
-  if (services.length === 0 && !serviceLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
-          <h2 className="text-2xl font-bold text-red-700 mb-4">No Services Available</h2>
-          <p className="text-gray-600 mb-6">
-            Please ask an administrator to add services before you can book.
-          </p>
-          <Link to="/services" className="text-blue-600 hover:underline">View Services Page</Link>
-        </div>
-      </div>
-    );
+  // If user is an admin, deny access to this page
+  if (userRole === 'admin') {
+      return (
+          <div className="flex items-center justify-center min-h-screen bg-red-50 bg-opacity-70 text-red-700 p-4">
+              <p className="text-lg font-semibold">Access Denied: Administrators cannot book appointments.</p>
+          </div>
+      );
   }
 
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
-        <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">Book Your Home Visit</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg"> {/* Increased max-w for address fields */}
+        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">Book Your Home Visit</h2>
 
         {message && (
-          <p className={`mb-4 text-center ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`mb-4 text-center ${message.includes('successfully') ? 'text-green-600' : 'text-red-600'}`}>
             {message}
           </p>
         )}
 
-        {/* Service Selection */}
-        <div className="mb-4">
-          <label htmlFor="service" className="block text-gray-700 text-sm font-bold mb-2">
-            Select Service:
-          </label>
-          <select
-            id="service"
-            name="service"
-            className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            value={formData.service}
-            onChange={handleChange}
-            required
-          >
-            {services.map(service => (
-              <option key={service._id} value={service.name}>
-                {service.name} (₹{service.price})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Date and Time */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">
-              Date:
-            </label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={formData.date}
-              onChange={handleChange}
-              required
-            />
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="serviceName" className="block text-gray-700 text-sm font-bold mb-2">
+                Select Service:
+              </label>
+              <select
+                id="serviceName"
+                name="serviceName"
+                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={formData.serviceName}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select a Service</option>
+                {services.length > 0 ? (
+                  services.map((service) => (
+                    <option key={service._id} value={service.name}>
+                      {service.name} (₹{service.price})
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>No services available</option>
+                )}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="appointmentDate" className="block text-gray-700 text-sm font-bold mb-2">
+                Date:
+              </label>
+              <input
+                type="date"
+                id="appointmentDate"
+                name="appointmentDate"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={formData.appointmentDate}
+                onChange={handleChange}
+                required
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="time" className="block text-gray-700 text-sm font-bold mb-2">
+
+          <div className="mb-4">
+            <label htmlFor="timeSlot" className="block text-gray-700 text-sm font-bold mb-2">
               Time Slot:
             </label>
-            <input
-              type="text" 
-              id="time"
-              name="time"
-              placeholder="e.g., 10:00 AM - 11:00 AM"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={formData.time}
+            <select
+              id="timeSlot"
+              name="timeSlot"
+              className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              value={formData.timeSlot}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">Select a Time Slot</option>
+              {predefinedTimeSlots.map((slot, index) => (
+                <option key={index} value={slot}>
+                  {slot}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
 
-        {/* Address Fields */}
-        <h3 className="text-xl font-semibold text-gray-800 mb-3 mt-6">Your Address for Home Visit:</h3>
-        <div className="mb-4">
-          <label htmlFor="street" className="block text-gray-700 text-sm font-bold mb-2">
-            Street Address:
-          </label>
-          <input
-            type="text"
-            id="street"
-            name="street"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            value={formData.address.street}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label htmlFor="city" className="block text-gray-700 text-sm font-bold mb-2">
-              City:
+          {/* Separate Address Fields */}
+          <h3 className="text-xl font-bold text-gray-800 mt-6 mb-4">Your Address for Home Visit:</h3>
+          <div className="mb-4">
+            <label htmlFor="streetAddress" className="block text-gray-700 text-sm font-bold mb-2">
+              Street Address:
             </label>
             <input
               type="text"
-              id="city"
-              name="city"
+              id="streetAddress"
+              name="streetAddress"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={formData.address.city}
+              value={formData.streetAddress}
               onChange={handleChange}
               required
             />
           </div>
-          <div>
-            <label htmlFor="state" className="block text-gray-700 text-sm font-bold mb-2">
-              State:
-            </label>
-            <input
-              type="text"
-              id="state"
-              name="state"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={formData.address.state}
-              onChange={handleChange}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="city" className="block text-gray-700 text-sm font-bold mb-2">
+                City:
+              </label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={formData.city}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="state" className="block text-gray-700 text-sm font-bold mb-2">
+                State:
+              </label>
+              <input
+                type="text"
+                id="state"
+                name="state"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={formData.state}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label htmlFor="zipCode" className="block text-gray-700 text-sm font-bold mb-2">
-              Zip Code:
-            </label>
-            <input
-              type="text"
-              id="zipCode"
-              name="zipCode"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={formData.address.zipCode}
-              onChange={handleChange}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label htmlFor="zipCode" className="block text-gray-700 text-sm font-bold mb-2">
+                Zip Code:
+              </label>
+              <input
+                type="text"
+                id="zipCode"
+                name="zipCode"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={formData.zipCode}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="country" className="block text-gray-700 text-sm font-bold mb-2">
+                Country:
+              </label>
+              <input
+                type="text"
+                id="country"
+                name="country"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={formData.country}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="country" className="block text-gray-700 text-sm font-bold mb-2">
-              Country:
-            </label>
-            <input
-              type="text"
-              id="country"
-              name="country"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={formData.address.country}
-              onChange={handleChange}
-              required
-              readOnly 
-            />
-          </div>
-        </div>
 
-        {/* Notes */}
-        <div className="mb-6">
-          <label htmlFor="notes" className="block text-gray-700 text-sm font-bold mb-2">
-            Additional Notes (Optional):
-          </label>
-          <textarea
-            id="notes"
-            name="notes"
-            rows="3"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            value={formData.notes}
-            onChange={handleChange}
-          ></textarea>
-        </div>
-
-        <button
-          type="submit"
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-          disabled={loading}
-        >
-          {loading ? 'Booking...' : 'Confirm Appointment'}
-        </button>
-      </form>
+          <div className="mb-6">
+            <label htmlFor="notes" className="block text-gray-700 text-sm font-bold mb-2">
+              Additional Notes (Optional):
+            </label>
+            <textarea
+              id="notes"
+              name="notes"
+              rows="3"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              value={formData.notes}
+              onChange={handleChange}
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+            disabled={loading}
+          >
+            {loading ? 'Booking...' : 'Confirm Appointment'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
