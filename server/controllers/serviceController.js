@@ -1,5 +1,5 @@
-// EzLabs/server/controllers/serviceController.js
-const Service = require('../models/Service'); // Import the Service model
+// EzLabs/server/controllers/serviceController.js - ABSOLUTELY COMPLETE AND CORRECT VERSION
+const Service = require('../models/Service');
 
 // @desc    Create a new service
 // @route   POST /api/services
@@ -7,16 +7,14 @@ const Service = require('../models/Service'); // Import the Service model
 const createService = async (req, res) => {
   const { name, description, price, type } = req.body;
 
-  // Basic validation
   if (!name || !description || !price || !type) {
-    return res.status(400).json({ message: 'Please enter all required fields: name, description, price, type' });
+    return res.status(400).json({ message: 'Please provide all service details.' });
   }
 
   try {
-    // Check if service already exists
     const serviceExists = await Service.findOne({ name });
     if (serviceExists) {
-      return res.status(400).json({ message: 'Service with this name already exists' });
+      return res.status(400).json({ message: 'Service with this name already exists.' });
     }
 
     const service = await Service.create({
@@ -38,7 +36,7 @@ const createService = async (req, res) => {
 
 // @desc    Get all services
 // @route   GET /api/services
-// @access  Public (or Private if preferred, but public for browsing)
+// @access  Public
 const getServices = async (req, res) => {
   try {
     const services = await Service.find({});
@@ -53,7 +51,78 @@ const getServices = async (req, res) => {
   }
 };
 
+// @desc    Update a service
+// @route   PUT /api/services/:id
+// @access  Private (Admin only)
+const updateService = async (req, res) => {
+  const { id } = req.params; // Service ID from URL
+  const { name, description, price, type, isActive } = req.body; // Allow updating isActive too
+
+  try {
+    let service = await Service.findById(id);
+
+    if (!service) {
+      return res.status(404).json({ message: 'Service not found' });
+    }
+
+    // Check if name is being changed and if new name already exists for another service
+    if (name && name !== service.name) {
+        const serviceExists = await Service.findOne({ name });
+        // IMPORTANT: Ensure the existing service is NOT the one we are currently updating
+        if (serviceExists && serviceExists._id.toString() !== id) {
+            return res.status(400).json({ message: 'Service with this name already exists.' });
+        }
+    }
+
+    // Update fields if provided (use undefined check for optional fields)
+    service.name = name !== undefined ? name : service.name;
+    service.description = description !== undefined ? description : service.description;
+    service.price = price !== undefined ? price : service.price;
+    service.type = type !== undefined ? type : service.type;
+    // Handle boolean isActive specifically, as false is a valid update
+    if (typeof isActive === 'boolean') {
+        service.isActive = isActive;
+    }
+
+    const updatedService = await service.save(); // Use save() to trigger pre-save hooks if any
+
+    res.status(200).json({
+      message: 'Service updated successfully',
+      data: updatedService,
+    });
+  } catch (error) {
+    console.error('Error updating service:', error);
+    res.status(500).json({ message: 'Server Error: Could not update service' });
+  }
+};
+
+// @desc    Delete a service
+// @route   DELETE /api/services/:id
+// @access  Private (Admin only)
+const deleteService = async (req, res) => {
+  const { id } = req.params; // Service ID from URL
+
+  try {
+    const service = await Service.findById(id);
+
+    if (!service) {
+      return res.status(404).json({ message: 'Service not found' });
+    }
+
+    await service.deleteOne(); // Mongoose 6+ uses deleteOne() or deleteMany()
+
+    res.status(200).json({
+      message: 'Service removed successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting service:', error);
+    res.status(500).json({ message: 'Server Error: Could not delete service' });
+  }
+};
+
 module.exports = {
   createService,
   getServices,
+  updateService, // Ensure these are correctly listed here
+  deleteService, // Ensure these are correctly listed here
 };

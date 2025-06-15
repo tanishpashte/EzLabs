@@ -1,44 +1,30 @@
-// EzLabs/server/middleware/authMiddleware.js - CORRECTED EXPORT
+// EzLabs/server/middleware/authMiddleware.js - VERIFY THIS EXACTLY
 const jwt = require('jsonwebtoken');
 
 const protect = (req, res, next) => {
   let token;
 
-  // console.log('--- Entering protect middleware ---');
-  // console.log('Authorization Header:', req.headers.authorization);
-
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
+      // Get token from header
       token = req.headers.authorization.split(' ')[1];
-      // console.log('Extracted Token:', token);
 
+      // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      // console.log('Decoded Token:', decoded);
 
-      // This was the fix we implemented earlier
-      req.user = decoded.user;
-      // console.log('req.user set to:', req.user);
-      next();
+      // Attach the entire user object (containing id and role) from the payload
+      req.user = decoded.user; // This is the crucial line we fixed recently
+
+      next(); // Proceed to the next middleware/route handler
     } catch (error) {
       console.error('Token verification failed inside middleware:', error);
+      // Don't throw, send response
       return res.status(401).json({ message: 'Not authorized, token failed' });
     }
-  } else { // Added an 'else' block here for clarity, though it's logically similar to the !token check
-    // console.log('No Authorization header or not starting with Bearer.');
+  } else {
+    // No token provided in header
     return res.status(401).json({ message: 'Not authorized, no token' });
   }
-
-  // The original `if (!token)` check is essentially redundant if the `else` above is hit.
-  // But keeping it just in case if there's any path where token isn't set but no header starts with Bearer
-  // if (!token) {
-  //   console.log('No token found in header.');
-  //   return res.status(401).json({ message: 'Not authorized, no token' });
-  // }
-  // console.log('--- Exiting protect middleware (should not reach here if no token or error) ---');
 };
 
-// Ensure 'protect' is defined before it's exported
-module.exports = { protect }; // <--- Make absolutely sure this line is exactly here and correct
-
-// Remove debugging logs at the end, or keep them for now
-// console.log('Type of protect function:', typeof protect);
+module.exports = { protect }; // <--- THIS IS CRITICAL: Ensure 'protect' is defined above and correctly exported
