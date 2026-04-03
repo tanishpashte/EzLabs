@@ -9,7 +9,6 @@ function AllBookings() {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null); 
 
-  // Define all possible statuses for the dropdown
   const allStatuses = [
     'pending',
     'confirmed',
@@ -55,13 +54,13 @@ function AllBookings() {
         console.error('Failed to fetch all bookings:', error.response?.data || error.message);
         setMessage(error.response?.data?.message || 'Failed to load bookings. Please log in again.');
         setLoading(false);
-        localStorage.removeItem('token'); // Likely an expired/invalid admin token
+        localStorage.removeItem('token'); 
         localStorage.removeItem('role');
         setTimeout(() => navigate('/login'), 1500);
       }
     };
 
-    if (role === 'admin') { // Only fetch if role is confirmed admin
+    if (role === 'admin') { 
       fetchAllBookings();
     }
   }, [navigate]);
@@ -83,7 +82,6 @@ function AllBookings() {
         }
       );
       setMessage(`Booking ${bookingId} status updated to ${newStatus}`);
-      // Update the booking in the local state to reflect the change
       setBookings(prevBookings =>
         prevBookings.map(booking =>
           booking._id === bookingId ? { ...booking, status: newStatus } : booking
@@ -95,7 +93,6 @@ function AllBookings() {
     }
   };
 
-  // Function to get appropriate styling based on booking status (reused from MyBookings)
   const getStatusClasses = (status) => {
     switch (status) {
       case 'pending':

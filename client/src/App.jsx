@@ -1,9 +1,8 @@
-    // client/src/App.jsx - AFTER PROFILE CONSOLIDATION
     import React, { useState, useEffect } from 'react';
     import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
     import Register from './components/Register';
     import Login from './components/Login';
-    import Dashboard from './components/Dashboard'; // This will now serve as Dashboard & Profile
+    import Dashboard from './components/Dashboard'; 
     import UserList from './components/UserList';
     import Services from './components/Services';
     import BookAppointment from './components/BookAppointment';
@@ -13,7 +12,6 @@
     import ManageServices from './components/ManageServices';
     import MyLabTests from './components/MyLabTests';
     import UploadTestResult from './components/UploadTestResult';
-    // Removed: import Profile from './components/Profile';
 
     function App() {
       const [isAdmin, setIsAdmin] = useState(false);
@@ -115,13 +113,12 @@
             } />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} /> {/* This is the consolidated route */}
+            <Route path="/dashboard" element={<Dashboard />} /> 
             <Route path="/users" element={<UserList />} />
             <Route path="/services" element={<Services />} />
             <Route path="/book-appointment" element={<BookAppointment />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/my-lab-tests" element={<MyLabTests />} />
-            {/* Removed: <Route path="/profile" element={<Profile />} /> */}
 
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

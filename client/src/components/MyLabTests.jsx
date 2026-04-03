@@ -31,7 +31,7 @@ function MyLabTests() {
         console.error('Failed to fetch lab test results:', error.response?.data || error.message);
         setMessage(error.response?.data?.message || 'Failed to load results. Please log in again.');
         setLoading(false);
-        localStorage.removeItem('token'); // Likely an expired/invalid token
+        localStorage.removeItem('token'); 
         localStorage.removeItem('role');
         localStorage.removeItem('userId');
         setTimeout(() => navigate('/login'), 1500);
@@ -41,7 +41,7 @@ function MyLabTests() {
     fetchMyTestResults();
   }, [navigate]);
 
-  // Function to get appropriate styling based on result status
+
   const getStatusClasses = (status) => {
     switch (status) {
       case 'pending review':

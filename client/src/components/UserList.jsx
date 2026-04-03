@@ -8,14 +8,11 @@ function UserList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Function to fetch user data from the backend
     const fetchUsers = async () => {
       const token = localStorage.getItem('token');
 
-      // If no token is found, the user is not logged in
       if (!token) {
         setMessage('You are not logged in. Redirecting to login...');
-        // Redirect to the login page after a short delay
         setTimeout(() => navigate('/login'), 1500);
         return; 
       }
@@ -24,7 +21,7 @@ function UserList() {
         
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/users`, {
           headers: {
-            Authorization: `Bearer ${token}` // Send the token in 'Bearer TOKEN' format
+            Authorization: `Bearer ${token}` 
           }
         });
         
@@ -38,11 +35,9 @@ function UserList() {
       }
     };
 
-    // Call the fetchUsers function when the component mounts or 'navigate' dependency changes
     fetchUsers();
   }, [navigate]); 
 
-  // Display a loading message while data is being fetched and there's no message yet
   if (!users.length && !message) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -56,14 +51,12 @@ function UserList() {
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl mt-8">
         <h2 className="text-3xl font-bold text-center text-teal-700 mb-6">All Registered Users</h2>
 
-        {/* Display success or error messages */}
         {message && (
           <p className={`mb-4 text-center ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
             {message}
           </p>
         )}
 
-        {/* Render the table only if there are users to display */}
         {users.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200">
@@ -82,9 +75,9 @@ function UserList() {
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user._id} className="hover:bg-gray-50"> {/* Key for list rendering */}
+                  <tr key={user._id} className="hover:bg-gray-50"> 
                     <td className="py-2 px-4 border-b border-gray-200 text-sm text-gray-800">
-                      {user._id.substring(0, 8)}... {/* Display a shortened version of the MongoDB _id */}
+                      {user._id.substring(0, 8)}... {/* shortened version of the MongoDB _id */}
                     </td>
                     <td className="py-2 px-4 border-b border-gray-200 text-sm text-gray-800">
                       {user.name}
@@ -98,7 +91,6 @@ function UserList() {
             </table>
           </div>
         ) : (
-          // Only show "No users found" if there's no success message 
           !message.includes('success') && (
             <p className="text-center text-gray-600 text-lg">No users found.</p>
           )

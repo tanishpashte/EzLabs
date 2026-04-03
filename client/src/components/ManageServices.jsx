@@ -9,18 +9,18 @@
         name: '',
         description: '',
         price: '',
-        type: 'Other', // Default type
+        type: 'Other', 
       });
       const [services, setServices] = useState([]);
       const [message, setMessage] = useState('');
       const [loading, setLoading] = useState(false); // For add service form
-      const [servicesLoading, setServicesLoading] = useState(true); // For fetching initial services
+      const [servicesLoading, setServicesLoading] = useState(true); 
       const [userRole, setUserRole] = useState(null);
 
-      // State for editing
+
       const [isEditing, setIsEditing] = useState(false);
-      const [currentService, setCurrentService] = useState(null); // Holds data of service being edited
-      const [editFormData, setEditFormData] = useState({ // For the edit form
+      const [currentService, setCurrentService] = useState(null); 
+      const [editFormData, setEditFormData] = useState({ 
         name: '',
         description: '',
         price: '',
@@ -28,10 +28,8 @@
         isActive: true, 
       });
 
-      // Valid service types (matches backend enum)
       const serviceTypes = ["Blood Test", "Urine Test", "ECG", "Health Package", "Other"];
 
-      // Utility function to fetch all services
       const fetchServices = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -58,7 +56,7 @@
         }
       };
 
-      // Initial load and role check
+      
       useEffect(() => {
         const role = localStorage.getItem('role');
         setUserRole(role);
@@ -69,14 +67,12 @@
           return;
         }
         fetchServices();
-      }, [navigate]); // Depend on navigate to prevent infinite loop
+      }, [navigate]); 
 
-      // Handle change for Add Service form
       const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
       };
 
-      // Handle change for Edit Service form
       const handleEditChange = (e) => {
         const { name, value, type, checked } = e.target;
         setEditFormData({
@@ -85,7 +81,6 @@
         });
       };
 
-      // Handle Add Service submission
       const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
@@ -106,8 +101,8 @@
           });
           setMessage(response.data.message || 'Service added successfully!');
           setLoading(false);
-          setFormData({ name: '', description: '', price: '', type: 'Other' }); // Clear form
-          fetchServices(); // Re-fetch services to update the list
+          setFormData({ name: '', description: '', price: '', type: 'Other' }); 
+          fetchServices(); 
         } catch (error) {
           console.error('Add service error:', error.response?.data || error.message);
           setMessage(error.response?.data?.message || 'Failed to add service. Check if name is unique.');
@@ -115,11 +110,10 @@
         }
       };
 
-      // Handle Edit Service submission
       const handleEditSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
-        setLoading(true); // Re-use loading state for edit action
+        setLoading(true); 
 
         const token = localStorage.getItem('token');
         if (!token || userRole !== 'admin' || !currentService) {
@@ -136,9 +130,9 @@
           });
           setMessage(response.data.message || 'Service updated successfully!');
           setLoading(false);
-          setIsEditing(false); // Close edit modal
-          setCurrentService(null); // Clear current service
-          fetchServices(); // Re-fetch services to show updated data
+          setIsEditing(false); 
+          setCurrentService(null); 
+          fetchServices();
         } catch (error) {
           console.error('Edit service error:', error.response?.data || error.message);
           setMessage(error.response?.data?.message || 'Failed to update service. Check data or if name is unique.');
@@ -147,10 +141,10 @@
       };
 
 
-      // Handle Delete Service
+  
       const handleDelete = async (serviceId) => {
         if (!window.confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
-          return; // User cancelled
+          return; 
         }
 
         setMessage('');
@@ -167,14 +161,13 @@
             },
           });
           setMessage(response.data.message || 'Service deleted successfully!');
-          fetchServices(); // Re-fetch services to update the list
+          fetchServices(); 
         } catch (error) {
           console.error('Delete service error:', error.response?.data || error.message);
           setMessage(error.response?.data?.message || 'Failed to delete service.');
         }
       };
 
-      // Set up edit form when edit button is clicked
       const handleEditClick = (service) => {
         setIsEditing(true);
         setCurrentService(service);

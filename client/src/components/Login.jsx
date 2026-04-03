@@ -36,9 +36,9 @@ function Login() {
       setLoading(false);
 
       if (response.data.role === 'admin') {
-        window.location.href = '/admin/dashboard'; // Full reload and redirect
+        window.location.href = '/admin/dashboard'; 
       } else {
-        window.location.href = '/dashboard'; // Full reload and redirect
+        window.location.href = '/dashboard'; 
       }
 
     } catch (error) {

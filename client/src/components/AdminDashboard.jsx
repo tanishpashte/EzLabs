@@ -45,7 +45,7 @@ function AdminDashboard() {
             <p>Add, edit, or remove lab services and their pricing.</p>
           </Link>
 
-          <Link // NEW LINK
+          <Link 
             to="/admin/upload-result"
             className="block p-6 bg-orange-500 text-white rounded-lg shadow-md hover:bg-orange-600 transition-colors duration-300 transform hover:-translate-y-1"
           >
@@ -53,7 +53,6 @@ function AdminDashboard() {
             <p>Add new lab test results for patients.</p>
           </Link>
 
-          {/* Add more admin links here as needed */}
         </div>
 
         <p className="mt-10 text-gray-600 text-lg">

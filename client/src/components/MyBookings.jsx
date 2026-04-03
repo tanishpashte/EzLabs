@@ -1,6 +1,6 @@
     
     import React, { useState, useEffect } from 'react';
-    import { useNavigate } from 'react-router-dom';
+    import { Link, useNavigate } from 'react-router-dom';
     import axios from 'axios';
 
     function MyBookings() {
@@ -25,23 +25,22 @@
                 Authorization: `Bearer ${token}`
               }
             });
-            setBookings(response.data.data); // Assuming response.data.data is the array of bookings
+            setBookings(response.data.data); 
+            console.log("No of bookings: ",bookings);
             setMessage('Bookings loaded successfully!');
             setLoading(false);
           } catch (error) {
             console.error('Failed to fetch user bookings:', error.response?.data || error.message);
             setMessage(error.response?.data?.message || 'Failed to load bookings. Please log in again.');
             setLoading(false);
-            // If token is invalid or expired, remove it and redirect
             localStorage.removeItem('token');
             setTimeout(() => navigate('/login'), 1500);
           }
         };
 
         fetchBookings();
-      }, [navigate]); // Add navigate to dependency array
+      }, [navigate]); 
 
-      // Function to get appropriate styling based on booking status
       const getStatusClasses = (status) => {
         switch (status) {
           case 'pending':

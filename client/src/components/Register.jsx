@@ -1,4 +1,3 @@
-// client/src/components/Register.jsx - UPDATED FOR AUTO-LOGIN
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -32,22 +31,19 @@ function Register() {
     }
 
     try {
-      // Send registration data to backend
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, {
         name,
         email,
         password,
       });
 
-      // NEW: Store token and role from the registration response
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('role', response.data.role); // Backend should return 'user' role
-      localStorage.setItem('userId', response.data._id); // Store user ID
+      localStorage.setItem('role', response.data.role); // default role: user
+      localStorage.setItem('userId', response.data._id); 
 
       setMessage('Registration successful! Logging you in...');
       setLoading(false);
 
-      // NEW: Redirect based on role (auto-login)
       if (response.data.role === 'admin') {
         window.location.href = '/admin/dashboard';
       } else {

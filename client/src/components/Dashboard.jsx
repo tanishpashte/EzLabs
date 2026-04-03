@@ -63,7 +63,6 @@ function Dashboard() {
 
         {userData ? (
           <div className="text-gray-800 space-y-4">
-            {/* Access the id and role from userData.userId object */}
             <p className="text-lg"><strong>User ID:</strong> {userData.userId.id}</p>
             <p className="text-lg"><strong>User Role:</strong> <span className="capitalize">{userData.userId.role}</span></p>
             <p className="text-lg"><strong>Secret Info:</strong> {userData.secretInfo}</p>

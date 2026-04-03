@@ -1,4 +1,3 @@
-// client/src/components/UploadTestResult.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -13,16 +12,14 @@ function UploadTestResult() {
     units: '',
     referenceRange: '',
     interpretation: '',
-    // Ensure this default matches an enum value in your schema
-    status: 'pending review', // THIS MUST BE ONE OF THE ENUM VALUES
+    status: 'pending review', 
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const [services, setServices] = useState([]); // State to store available services
-  const [servicesLoading, setServicesLoading] = useState(true); // For fetching services
+  const [services, setServices] = useState([]); 
+  const [servicesLoading, setServicesLoading] = useState(true); 
 
-  // Valid status options for the dropdown, MUST match LabTestResult schema enum
   const testStatuses = ["pending review", "finalized", "published", "archived"];
 
 
@@ -88,7 +85,6 @@ function UploadTestResult() {
       });
       setMessage(response.data.message || 'Lab test result uploaded successfully!');
       setLoading(false);
-      // Clear form after successful upload
       setFormData({
         userEmail: '',
         testName: '',
@@ -97,7 +93,7 @@ function UploadTestResult() {
         units: '',
         referenceRange: '',
         interpretation: '',
-        status: 'pending review', // Reset to default
+        status: 'pending review', 
       });
     } catch (error) {
       console.error('Upload test result error:', error.response?.data || error.message);
@@ -150,7 +146,6 @@ function UploadTestResult() {
             />
           </div>
 
-          {/* Test Name Dropdown */}
           <div className="mb-4">
             <label htmlFor="testName" className="block text-gray-700 text-sm font-bold mb-2">
               Test Name:
@@ -249,7 +244,6 @@ function UploadTestResult() {
             ></textarea>
           </div>
 
-          {/* Status Dropdown - Ensure options match schema enum values exactly */}
           <div className="mb-6">
             <label htmlFor="status" className="block text-gray-700 text-sm font-bold mb-2">
               Status:
@@ -263,7 +257,7 @@ function UploadTestResult() {
               required
             >
               {testStatuses.map(statusOption => (
-                <option key={statusOption} value={statusOption}>{statusOption.replace(/\b\w/g, char => char.toUpperCase())}</option> // Capitalize for display, value remains lowercase
+                <option key={statusOption} value={statusOption}>{statusOption.replace(/\b\w/g, char => char.toUpperCase())}</option> 
               ))}
             </select>
           </div>

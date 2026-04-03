@@ -1,4 +1,3 @@
-// client/src/components/BookAppointment.jsx - Corrected API Endpoint to /api/bookings
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,22 +7,20 @@ function BookAppointment() {
   const [formData, setFormData] = useState({
     serviceName: '',
     appointmentDate: '',
-    timeSlot: '', // This will be selected from predefined options
-    // Separate address fields
+    timeSlot: '', 
     streetAddress: '',
     city: '',
     state: '',
     zipCode: '',
-    country: 'India', // Default to India as per screenshot
+    country: 'India', 
     notes: '',
   });
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false); // For form submission
-  const [services, setServices] = useState([]); // To store available services
-  const [servicesLoading, setServicesLoading] = useState(true); // For fetching services
-  const [userRole, setUserRole] = useState(null); // To check user role for access
+  const [loading, setLoading] = useState(false); 
+  const [services, setServices] = useState([]); 
+  const [servicesLoading, setServicesLoading] = useState(true); 
+  const [userRole, setUserRole] = useState(null); 
 
-  // Predefined common time slots for selection
   const predefinedTimeSlots = [
     '09:00 AM - 10:00 AM',
     '10:00 AM - 11:00 AM',
@@ -34,16 +31,15 @@ function BookAppointment() {
     '04:00 PM - 05:00 PM',
   ];
 
-  // Fetch user role and services on component mount
+
   useEffect(() => {
     const role = localStorage.getItem('role');
-    setUserRole(role); // Set role from localStorage
+    setUserRole(role); 
     const token = localStorage.getItem('token');
 
-    // Redirect if not logged in or is an admin (admins shouldn't book)
     if (!token || role === 'admin') {
       setMessage('Access Denied or Not Logged In. Redirecting...');
-      setServicesLoading(false); // Stop loading early
+      setServicesLoading(false); 
       setTimeout(() => navigate(role === 'admin' ? '/admin/dashboard' : '/login'), 1500);
       return;
     }
@@ -51,16 +47,14 @@ function BookAppointment() {
     const fetchServices = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/services`, {
-          headers: { Authorization: `Bearer ${token}` } // Send token even for public services for consistency
+          headers: { Authorization: `Bearer ${token}` } 
         });
-        // Filter for active services and set them
         setServices(response.data.data.filter(service => service.isActive));
         setServicesLoading(false);
       } catch (error) {
         console.error('Failed to fetch services:', error.response?.data || error.message);
         setMessage('Failed to load services. Please try again.');
         setServicesLoading(false);
-        // Clear token if it's invalid and redirect to login
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('userId');
@@ -69,7 +63,7 @@ function BookAppointment() {
     };
 
     fetchServices();
-  }, [navigate]); // Add navigate to dependency array
+  }, [navigate]); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -77,27 +71,22 @@ function BookAppointment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(''); // Clear previous messages
-    setLoading(true); // Set loading state
+    setMessage(''); 
+    setLoading(true); 
 
     const token = localStorage.getItem('token');
-    // Double check token and role before proceeding
     if (!token || userRole === 'admin') {
         setMessage('Unauthorized action. Please log in as a regular user.');
         setLoading(false);
         return;
     }
 
-    // Construct the address string from separate fields
-    const fullAddress = `${formData.streetAddress}, ${formData.city}, ${formData.state} - ${formData.zipCode}, ${formData.country}`;
-
     try {
-      // CORRECTED: Changed endpoint to /api/bookings
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/bookings`, {
         serviceName: formData.serviceName,
         appointmentDate: formData.appointmentDate,
         timeSlot: formData.timeSlot,
-        streetAddress: formData.streetAddress, // Send separate fields as expected by current backend controller
+        streetAddress: formData.streetAddress, 
         city: formData.city,
         state: formData.state,
         zipCode: formData.zipCode,
@@ -109,7 +98,6 @@ function BookAppointment() {
         },
       });
       setMessage(response.data.message || 'Appointment booked successfully!');
-      // Clear form fields on success
       setFormData({
         serviceName: '',
         appointmentDate: '',
@@ -118,14 +106,14 @@ function BookAppointment() {
         city: '',
         state: '',
         zipCode: '',
-        country: 'India', // Reset country default
+        country: 'India', 
         notes: '',
       });
     } catch (error) {
       console.error('Booking error:', error.response?.data || error.message);
       setMessage(error.response?.data?.message || 'Failed to book appointment. Please check your details.');
     } finally {
-      setLoading(false); // Always stop loading
+      setLoading(false); 
     }
   };
 
@@ -137,7 +125,6 @@ function BookAppointment() {
     );
   }
 
-  // If user is an admin, deny access to this page
   if (userRole === 'admin') {
       return (
           <div className="flex items-center justify-center min-h-screen bg-red-50 bg-opacity-70 text-red-700 p-4">
@@ -149,7 +136,7 @@ function BookAppointment() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg"> {/* Increased max-w for address fields */}
+      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg"> 
         <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">Book Your Home Visit</h2>
 
         {message && (
@@ -222,7 +209,6 @@ function BookAppointment() {
             </select>
           </div>
 
-          {/* Separate Address Fields */}
           <h3 className="text-xl font-bold text-gray-800 mt-6 mb-4">Your Address for Home Visit:</h3>
           <div className="mb-4">
             <label htmlFor="streetAddress" className="block text-gray-700 text-sm font-bold mb-2">
