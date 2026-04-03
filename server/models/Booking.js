@@ -45,16 +45,16 @@ const bookingSchema = mongoose.Schema(
     status: { 
       type: String,
       enum: [
-        'pending',             // Initial state after booking
-        'confirmed',           // Lab confirms the slot
-        'assigned',            // Lab person assigned for visit
-        'on the way',          // Lab person is en route
-        'sample collected',    // Sample has been collected
-        'sample processing',   // Sample is being processed in lab
-        'reports generation',  // Reports are being prepared
-        'completed',           // Reports are ready/delivered
-        'cancelled',           // Booking cancelled by user/admin
-        'rescheduled'          // Booking has been rescheduled
+        'pending',             
+        'confirmed',           
+        'assigned',             
+        'on the way',           
+        'sample collected',    
+        'sample processing',    
+        'reports generation',  
+        'completed',           
+        'cancelled',            
+        'rescheduled'          
       ],
       default: 'pending',
     },

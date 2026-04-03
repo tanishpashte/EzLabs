@@ -1,20 +1,14 @@
-// server/controllers/labtestController.js
-
-// Import asyncHandler to wrap your async functions and automatically catch errors.
-// This prevents crashing your server for unhandled promise rejections.
+// prevents crashing your server for unhandled promise rejections.
 const asyncHandler = require('express-async-handler');
 
-// Import your Mongoose models
 const LabTestResult = require('../models/LabTestResult');
-const User = require('../models/User'); // We need the User model to find the user by email
+const User = require('../models/User'); 
 
 // @desc    Create a new lab test result
 // @route   POST /api/labresults
-// @access  Private (Admin) - Only administrators should be able to upload results
+// @access  Private (Admin) 
 const createTestResult = asyncHandler(async (req, res) => {
-  // --- STEP 1: Authorization Check ---
-  // The 'protect' middleware (used in your routes) adds a 'user' object to 'req'
-  // if a valid token is provided. We check its 'role'.
+
   if (req.user.role !== 'admin') {
     res.status(403); // HTTP 403 Forbidden
     throw new Error('Not authorized to upload lab test results. Admin access required.');

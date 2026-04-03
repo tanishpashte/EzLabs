@@ -16,7 +16,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a password'],
     },
-    role: { // NEW FIELD: User Role
+    role: { 
       type: String,
       enum: ['user', 'admin'], 
       default: 'user',       

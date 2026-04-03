@@ -7,7 +7,6 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
-// NEW: Import labTestRoutes
 const labTestRoutes = require('./routes/labTestRoutes'); 
 
 const { protect } = require('./middleware/authMiddleware');
@@ -28,7 +27,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/bookings', bookingRoutes);
-// NEW: Lab Test Routes
 app.use('/api/labresults', labTestRoutes); 
 
 app.get('/api/user/profile', protect, (req, res) => {

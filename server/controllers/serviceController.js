@@ -65,7 +65,6 @@ const updateService = async (req, res) => {
       return res.status(404).json({ message: 'Service not found' });
     }
 
-    // Check if name is being changed and if new name already exists for another service
     if (name && name !== service.name) {
         const serviceExists = await Service.findOne({ name });
         
@@ -74,12 +73,10 @@ const updateService = async (req, res) => {
         }
     }
 
-    // Update fields if provided (use undefined check for optional fields)
     service.name = name !== undefined ? name : service.name;
     service.description = description !== undefined ? description : service.description;
     service.price = price !== undefined ? price : service.price;
     service.type = type !== undefined ? type : service.type;
-    // Handle boolean isActive specifically, as false is a valid update
     if (typeof isActive === 'boolean') {
         service.isActive = isActive;
     }
