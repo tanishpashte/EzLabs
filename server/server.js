@@ -31,8 +31,10 @@ app.use('/api/labresults', labTestRoutes);
 
 app.get('/api/user/profile', protect, (req, res) => {
   res.json({
-    message: `Welcome to your protected profile, user ID: ${req.user.id}`, 
-    data: { userId: req.user, secretInfo: "This is top secret!" }
+    data: {
+      userId: req.user.id,
+      role: req.user.role,
+    }
   });
 });
 
