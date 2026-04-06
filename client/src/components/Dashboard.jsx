@@ -69,7 +69,7 @@ function Dashboard() {
         
         <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Welcome back, User!</h1>
+            <h1 className="text-2xl font-bold text-slate-800">Welcome back, {userData.name}!</h1>
             <p className="text-slate-500">Manage your Profile</p>
           </div>
           
@@ -84,12 +84,12 @@ function Dashboard() {
             
             <div className="space-y-5">
               <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Account ID</label>
-                <p className="text-slate-700 font-mono text-sm truncate">{userData.userId}</p>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Name</label>
+                <p className="text-slate-700 font-mono text-sm capitalize truncate">{userData.name}</p>
               </div>
               <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Role</label>
-                <p className="text-slate-700 capitalize font-medium">{userData.role}</p>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Email</label>
+                <p className="text-slate-700 font-medium">{userData.email}</p>
               </div>
             </div>
           </div>

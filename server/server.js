@@ -34,6 +34,8 @@ app.get('/api/user/profile', protect, (req, res) => {
     data: {
       userId: req.user.id,
       role: req.user.role,
+      name: req.user.name,
+      email: req.user.email,
     }
   });
 });
