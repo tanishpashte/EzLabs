@@ -47,11 +47,11 @@
         <Router>
           <nav className="bg-gray-800 p-4 text-white">
             <ul className="flex justify-center space-x-4">
-              <li>
-                <Link to="/" className="hover:text-blue-300">Home</Link>
-              </li>
               {!isLoggedIn ? (
                 <>
+                  <li>
+                    <Link to="/" className="hover:text-blue-300">Home</Link>
+                  </li>
                   <li>
                     <Link to="/register" className="hover:text-blue-300">Register</Link>
                   </li>
@@ -102,7 +102,7 @@
           </nav>
 
           <Routes>
-            <Route path="/" element={
+            <Route path="/" element={isLoggedIn ?<Dashboard />:
               <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
                 <h1 className="text-4xl font-bold text-blue-600 mb-4">Welcome to EzLabs!</h1>
                 <p className="text-xl text-gray-700">Providing convenient home lab visits.</p>
@@ -111,8 +111,8 @@
                 </Link>
               </div>
             } />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/register" element= {isLoggedIn ?<Dashboard />: <Register />} />
+            <Route path="/login" element={isLoggedIn ?<Dashboard />: <Login />} />
             <Route path="/dashboard" element={<Dashboard />} /> 
             <Route path="/users" element={<UserList />} />
             <Route path="/services" element={<Services />} />
