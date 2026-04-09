@@ -12,6 +12,7 @@
     import ManageServices from './components/ManageServices';
     import MyLabTests from './components/MyLabTests';
     import UploadTestResult from './components/UploadTestResult';
+import LandingPage from './components/LandingPage';
 
     function App() {
       const [isAdmin, setIsAdmin] = useState(false);
@@ -102,15 +103,7 @@
           </nav>
 
           <Routes>
-            <Route path="/" element={isLoggedIn ?<Dashboard />:
-              <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-                <h1 className="text-4xl font-bold text-blue-600 mb-4">Welcome to EzLabs!</h1>
-                <p className="text-xl text-gray-700">Providing convenient home lab visits.</p>
-                <Link to="/services" className="mt-4 bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded">
-                  View Our Services
-                </Link>
-              </div>
-            } />
+            <Route path="/" element={isLoggedIn ?<Dashboard />:<LandingPage />  } />
             <Route path="/register" element= {isLoggedIn ?<Dashboard />: <Register />} />
             <Route path="/login" element={isLoggedIn ?<Dashboard />: <Login />} />
             <Route path="/dashboard" element={<Dashboard />} /> 
